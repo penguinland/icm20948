@@ -3,11 +3,15 @@ module github.com/viam-labs/icm20948
 go 1.20
 
 require (
-	github.com/pkg/errors v0.9.1
+	github.com/edaniels/golog v0.0.0-20230215213219-28954395e8d0
+	github.com/golang/geo v0.0.0-20210211234256-740aa86cb551
+	github.com/kellydunn/golang-geo v0.7.0
+	github.com/tracktum/go-ahrs v1.0.0
 	go.uber.org/multierr v1.11.0
-	go.viam.com/api v0.1.251
+	go.uber.org/zap v1.24.0
 	go.viam.com/rdk v0.18.0
 	go.viam.com/utils v0.1.58
+	gonum.org/v1/gonum v0.12.0
 	periph.io/x/conn/v3 v3.7.0
 	periph.io/x/host/v3 v3.8.2
 )
@@ -31,7 +35,6 @@ require (
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
 	github.com/docker/go-units v0.5.0 // indirect
-	github.com/edaniels/golog v0.0.0-20230215213219-28954395e8d0 // indirect
 	github.com/edaniels/lidario v0.0.0-20220607182921-5879aa7b96dd // indirect
 	github.com/edaniels/zeroconf v1.0.10 // indirect
 	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
@@ -44,7 +47,6 @@ require (
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
-	github.com/golang/geo v0.0.0-20210211234256-740aa86cb551 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
@@ -60,7 +62,6 @@ require (
 	github.com/improbable-eng/grpc-web v0.15.0 // indirect
 	github.com/jedib0t/go-pretty/v6 v6.4.6 // indirect
 	github.com/jhump/protoreflect v1.15.1 // indirect
-	github.com/kellydunn/golang-geo v0.7.0 // indirect
 	github.com/klauspost/compress v1.16.5 // indirect
 	github.com/kylelemons/go-gypsy v1.0.0 // indirect
 	github.com/lestrrat-go/backoff/v2 v2.0.8 // indirect
@@ -94,6 +95,7 @@ require (
 	github.com/pion/transport/v2 v2.2.3 // indirect
 	github.com/pion/turn/v2 v2.1.3 // indirect
 	github.com/pion/webrtc/v3 v3.2.21 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/rs/cors v1.9.0 // indirect
@@ -112,7 +114,7 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/goleak v1.2.1 // indirect
-	go.uber.org/zap v1.24.0 // indirect
+	go.viam.com/api v0.1.251 // indirect
 	go.viam.com/test v1.1.1-0.20220913152726-5da9916c08a2 // indirect
 	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/exp v0.0.0-20230321023759-10a507213a29 // indirect
@@ -125,7 +127,6 @@ require (
 	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/tools v0.10.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
-	gonum.org/v1/gonum v0.12.0 // indirect
 	gonum.org/v1/plot v0.12.0 // indirect
 	google.golang.org/api v0.126.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
