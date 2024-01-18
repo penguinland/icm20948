@@ -1,0 +1,13 @@
+{
+  "module_id": "viam-labs:icm-20948",
+  "visibility": "public",
+  "url": "https://github.com/viam-labs/icm20948",
+  "description": "icm20948 is a Viam modular component that provides a movement sensor interface for the ICM-20948 and MPU-9250 IMUs",
+  "models": [
+    {
+      "api": "rdk:component:movementsensor",
+      "model": "viam-labs:board:icm20948"
+    }
+  ],
+  "entrypoint": "icm20948"
+}
