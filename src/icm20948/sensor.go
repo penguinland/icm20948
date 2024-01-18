@@ -10,12 +10,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/edaniels/golog"
 	"github.com/golang/geo/r3"
 	geo "github.com/kellydunn/golang-geo"
 	ahrs "github.com/tracktum/go-ahrs"
 	"go.uber.org/multierr"
-	"go.uber.org/zap"
 
 	"periph.io/x/conn/v3/i2c"
 	"periph.io/x/conn/v3/i2c/i2creg"
@@ -24,6 +22,7 @@ import (
 	"gonum.org/v1/gonum/num/quat"
 
 	"go.viam.com/rdk/components/movementsensor"
+	"go.viam.com/rdk/logging"
 	"go.viam.com/rdk/resource"
 	"go.viam.com/rdk/spatialmath"
 	"go.viam.com/utils"
@@ -52,7 +51,7 @@ type mpu struct {
 	acceleration    r3.Vector
 	magnetometer    r3.Vector
 	mpuHandle, magHandle  i2c.Dev
-	logger          golog.Logger
+	logger          logging.Logger
 	aScale, gScale      float64
 	gXCal, gYCal, gZCal float64
 	ahrs            ahrs.Madgwick
@@ -92,7 +91,7 @@ func (i *mpu) Readings(ctx context.Context, extra map[string]interface{}) (map[s
 }
 
 // NewIMU creates a new mpu9250 IMU
-func NewIMU(ctx context.Context, deps resource.Dependencies, conf resource.Config, logger *zap.SugaredLogger) (movementsensor.MovementSensor, error) {
+func NewIMU(ctx context.Context, deps resource.Dependencies, conf resource.Config, logger logging.Logger) (movementsensor.MovementSensor, error) {
 	if _, err := host.Init(); err != nil {
 		return nil, err
 	}
