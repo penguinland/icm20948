@@ -106,7 +106,7 @@ const (
 	FIFO_COUNTH     = 0x72 // FIFO count registers (high bits)
 	FIFO_COUNTL     = 0x73 // FIFO count registers (low bits)
 	FIFO_R_W        = 0x74 // FIFO read/write
-	WHO_AM_I        = 0x75 // Who am I
+	WHO_AM_I        = 0x75
 
 
 

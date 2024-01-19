@@ -28,7 +28,7 @@ import (
 	"go.viam.com/utils"
 )
 
-var Model = resource.NewModel("viam-labs", "demo", "mpu9250")
+var Model = resource.NewModel("viam-labs", "demo", "icm20948")
 
 type Config struct {
 }
@@ -90,7 +90,7 @@ func (i *mpu) Readings(ctx context.Context, extra map[string]interface{}) (map[s
 	return readings, nil
 }
 
-// NewIMU creates a new mpu9250 IMU
+// NewIMU creates a new ICM-20948 IMU
 func NewIMU(ctx context.Context, deps resource.Dependencies, conf resource.Config, logger logging.Logger) (movementsensor.MovementSensor, error) {
 	if _, err := host.Init(); err != nil {
 		return nil, err
@@ -125,8 +125,6 @@ func NewIMU(ctx context.Context, deps resource.Dependencies, conf resource.Confi
 	var cancelCtx context.Context
 	cancelCtx, dev.cancelFunc = context.WithCancel(ctx)
 	waitCh := make(chan struct{})
-	// startTime := time.Now()
-	// ticks := 0
 	dev.activeBackgroundWorkers.Add(1)
 	utils.PanicCapturingGo(func() {
 		defer dev.activeBackgroundWorkers.Done()
@@ -143,10 +141,6 @@ func NewIMU(ctx context.Context, deps resource.Dependencies, conf resource.Confi
 			case <-cancelCtx.Done():
 				return
 			case <-timer.C:
-				// ticks++
-				// if ticks % 100 == 0 {
-				// 	logger.Debugf("MPU Time: %+v", time.Now().Sub(startTime) / time.Duration(ticks))
-				// }
 				err := dev.doRead(ctx)
 				if err != nil {
 					logger.Error(err)
@@ -160,11 +154,6 @@ func NewIMU(ctx context.Context, deps resource.Dependencies, conf resource.Confi
 }
 
 func (i *mpu) Reconfigure(ctx context.Context, deps resource.Dependencies, conf resource.Config) error {
-	// newConf, err := resource.NativeConfig[*Config](conf)
-	// if err != nil {
-	// 	return err
-	// }
-
 	return nil
 }
 
@@ -192,13 +181,7 @@ func (i *mpu) Accuracy(ctx context.Context, extra map[string]interface{}) (map[s
 	return map[string]float32{}, movementsensor.ErrMethodUnimplementedAccuracy
 }
 
-
-
-
 func (i *mpu) startMPU(ctx context.Context) error {
-	// i.mu.Lock()
-	// defer i.mu.Unlock()
-
 	// Reset
 	var errs error
 	errs = multierr.Combine(errs, writeByteData(i.mpuHandle, PWR_MGMT_1, 0b10000000))
@@ -208,34 +191,14 @@ func (i *mpu) startMPU(ctx context.Context) error {
 	errs = multierr.Combine(errs, writeByteData(i.mpuHandle, PWR_MGMT_1, 0b00000001))
 	if !utils.SelectContextOrWait(ctx, 100 * time.Millisecond) { return errs }
 
-	// Enable i2c passthrough for compass
+	// Enable I2C passthrough for compass
 	errs = multierr.Combine(errs, writeByteData(i.mpuHandle, INT_PIN_CFG, 0b00000010))
 	if !utils.SelectContextOrWait(ctx, 100 * time.Millisecond) { return errs }
-
-
-
-	// errs = multierr.Combine(errs, h.WriteByteData(ctx, SMPLRT_DIV, 0))
-	// if !utils.SelectContextOrWait(ctx, 100 * time.Millisecond) { return errs }
-
-	// errs = multierr.Combine(errs, h.WriteByteData(ctx, CONFIG, 0))
-	// if !utils.SelectContextOrWait(ctx, 100 * time.Millisecond) { return errs }
-
-	// errs = multierr.Combine(errs, h.WriteByteData(ctx, GYRO_CONFIG, 0))
-	// if !utils.SelectContextOrWait(ctx, 100 * time.Millisecond) { return errs }
-
-	// errs = multierr.Combine(errs, h.WriteByteData(ctx, USER_CTRL, 0))
-	// if !utils.SelectContextOrWait(ctx, 100 * time.Millisecond) { return errs }
-
-	// errs = multierr.Combine(errs, h.WriteByteData(ctx, INT_ENABLE, 1))
-	// if !utils.SelectContextOrWait(ctx, 100 * time.Millisecond) { return errs }
 
 	return errs
 }
 
 func (i *mpu) startMag(ctx context.Context) error {
-	// i.mu.Lock()
-	// defer i.mu.Unlock()
-
 	var errs error
 	errs = multierr.Combine(errs, writeByteData(i.magHandle, AK8963_CNTL, 0))
 	time.Sleep(100 * time.Millisecond)
@@ -254,15 +217,11 @@ func (i *mpu) startMag(ctx context.Context) error {
 func (i *mpu) Close(ctx context.Context) error {
 	i.cancelFunc()
 	i.activeBackgroundWorkers.Wait()
-	// i.mpuHandle.Close()
-	// i.magHandle.Close()
 	return nil
 }
 
 func (i *mpu) doRead(ctx context.Context) error {
-	// i.mu.Lock()
-	// defer i.mu.Unlock()
-
+	// TODO: clean this up
 	var errs error
 	x, err := i.readRawBits(ctx, ACCEL_XOUT_H)
 	errs = multierr.Combine(errs, err)
@@ -271,8 +230,6 @@ func (i *mpu) doRead(ctx context.Context) error {
 	z, err := i.readRawBits(ctx, ACCEL_ZOUT_H)
 	errs = multierr.Combine(errs, err)
 	acceleration := r3.Vector{X: i.scaleAcceleration(x), Y: i.scaleAcceleration(y), Z: i.scaleAcceleration(z)}
-
-
 
 	x, err = i.readRawBits(ctx, GYRO_XOUT_H)
 	errs = multierr.Combine(errs, err)
@@ -322,8 +279,6 @@ func (i *mpu) doRead(ctx context.Context) error {
 		i.magnetometer.Z / 100,
 	)
 
-	// i.logger.Debugf("SMURF %+v", q)
-
 	i.readMu.Lock()
 	myQuat := spatialmath.Quaternion(quat.Number{q[0], q[1], q[2], q[3]})
 	i.orientation = &myQuat
@@ -351,25 +306,15 @@ func (i *mpu) scaleMag(raw int16) float64 {
 }
 
 func (i *mpu) readRawBits(ctx context.Context, register uint8) (int16, error) {
-	// xH, err1 := i.mpuHandle.ReadByteData(ctx, register)
-	// xL, err2 := i.mpuHandle.ReadByteData(ctx, register+1)
-
 	x, err := readWordData(i.mpuHandle, register)
 	return int16((uint16(x[0])<<8)|uint16(x[1])), err
 }
 
 func (i *mpu) readRawBitsMag(ctx context.Context, register uint8) (int16, error) {
-	// xH, err1 := i.magHandle.ReadByteData(ctx, register)
-	// xL, err2 := i.magHandle.ReadByteData(ctx, register-1)
-
 	x, err := readWordData(i.magHandle, register-1)
 	return int16((uint16(x[1])<<8)|uint16(x[0])), err
 }
 
-
-func swapbytes16(d uint16) uint16 {
-	return (d << 8) | (d >> 8)
-}
 
 func writeByteData(dev i2c.Dev, reg, data byte) error {
 	_, err := dev.Write([]byte{reg, data})
